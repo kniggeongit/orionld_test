@@ -15,7 +15,7 @@ services:
     #command: "--hostname fiware-orion-test2 --port 1029 --log 0"
     command: "--hostname 192.168.9.18 --port 1029 --log 0"
     #command: "--hostname 192.168.9.18 --port 9090 --log 0"
-    #command: "--hostname 192.168.9.18 --port 5431 --log 0"
+    #command: "--hostname 192.168.9.18 --port 5431 --log 0" 
     
     networks:
       - test-network

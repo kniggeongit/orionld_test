@@ -1,0 +1,83 @@
+version: "3.5"
+services:
+  # docker-compose up --build  testscript-service
+  # docker-compose up testscript-service
+  test_script:
+    build:
+        context: .
+        dockerfile: test-container.Dockerfile
+    image: testscript-service-img
+    hostname:       testscript-service-img-vm
+    container_name: testscript-service-ct
+    depends_on:
+      - orion-test
+      #- scorpio
+    #command: "--hostname fiware-orion-test2 --port 1029 --log 0"
+    command: "--hostname 192.168.9.18 --port 1029 --log 0"
+    #command: "--hostname 192.168.9.18 --port 9090 --log 0"
+    #command: "--hostname 192.168.9.18 --port 5431 --log 0"
+    
+    networks:
+      - test-network
+
+  orion-test:
+    image: fiware/orion-ld
+    hostname:       orion-test2
+    container_name: fiware-orion-test2
+    expose:
+      - "1029"
+    ports:
+      - "1029:1026"
+    depends_on:
+      - mongo-db-test
+    #command: -dbhost mongo-db-test:27020 -logLevel DEBUG
+    command: -dbhost 192.168.9.18:27020 -logLevel DEBUG
+    #command: -dbhost mongo-db-test:27020 -logLevel DEBUG
+    networks:
+      - test-network
+    #mem_limit: 256m
+
+  mongo-db-test:
+    image: mongo:3.6
+    hostname:       mongo-db-test
+    container_name: mongo-db-test
+    ports:
+      - "27020:27017" 
+    networks:
+      - test-network
+    command: --nojournal
+    volumes:
+      - ./daten/mongo-db:/data/db
+    #mem_limit: 256m
+
+  ###########################################
+
+  postgres:
+    image: postgis/postgis
+    ports:
+      - "5432"
+    restart: always
+    environment:
+      POSTGRES_USER: ngb
+      POSTGRES_PASSWORD: ngb
+      POSTGRES_DB: ngb
+    volumes:
+      - ./daten/postgres:/var/lib/postgresql/data 
+    networks:
+      - test-network
+
+  scorpio:
+    image: scorpiobroker/all-in-one-runner:linux-amd64-latest
+    environment:
+      DBHOST: postgres
+      #DBHOST: 192.168.9.18:5432
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge

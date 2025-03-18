@@ -1,5 +1,5 @@
 version: "3.5"
-# test
+
 services:
   # docker-compose up --build  testscript-service
   # docker-compose up testscript-service
